@@ -1,0 +1,39 @@
+<breakpoints>
+	<cell>
+		<id>1</id>
+		<title>Cell 6</title>
+	</cell>
+	<cell>
+		<id>2</id>
+		<title>Cell 9</title>
+	</cell>
+	<cell>
+		<id>3</id>
+		<title>Cell 4</title>
+	</cell>
+	<cell>
+		<id>4</id>
+		<title>Cell 5</title>
+	</cell>
+	<breakpoint>
+		<id>1</id>
+		<cellid>2</cellid>
+		<description>Test description</description>
+		<datestarted>2/2/2020 12:00:00 AM</datestarted>
+		<datefinished>2/29/2020 12:00:00 AM</datefinished>
+	</breakpoint>
+	<breakpoint>
+		<id>2</id>
+		<cellid>4</cellid>
+		<description>Change of Procedure</description>
+		<datestarted>4/11/2020 7:15:42 PM</datestarted>
+		<datefinished>7/11/2020 7:15:42 PM</datefinished>
+	</breakpoint>
+	<breakpoint>
+		<id>3</id>
+		<cellid>1</cellid>
+		<description>New Boxes From Germany</description>
+		<datestarted>4/25/2020 12:00:00 AM</datestarted>
+		<datefinished>8/1/2020 12:00:00 AM</datefinished>
+	</breakpoint>
+</breakpoints>
