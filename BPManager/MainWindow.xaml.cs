@@ -54,7 +54,7 @@ namespace BPManager
 
             BPClass = LoadXML(BPClass);
 
-           addListItems();
+            addListItems();
 
 
         }
@@ -243,8 +243,8 @@ namespace BPManager
 
             BPClass[BPList.SelectedIndex].BPCell = BPCells[comboBPCell.SelectedIndex].CellID;
             BPClass[BPList.SelectedIndex].BPDescription = textBPDescription.Text;
-            BPClass[BPList.SelectedIndex].BPStart = dateBPStarted.SelectedDate.ToString();
-            BPClass[BPList.SelectedIndex].BPFinish = dateBPFinished.SelectedDate.ToString();
+            BPClass[BPList.SelectedIndex].BPStart = DateTime.Parse(dateBPStarted.SelectedDate.ToString()).ToString("MM/dd/yyyy");
+            BPClass[BPList.SelectedIndex].BPFinish = DateTime.Parse(dateBPFinished.SelectedDate.ToString()).ToString("MM/dd/yyyy"); 
             BPClass[BPList.SelectedIndex].BPCellNumber = retCellFromBPID(BPClass[BPList.SelectedIndex].BPCell);
 
             saveFile();
@@ -260,7 +260,7 @@ namespace BPManager
         private void ButtonNew_Click(object sender, RoutedEventArgs e)
         {
 
-            BPClass.Add(new Breakpoint { BPID = BPClass[BPClass.Count-1].BPID+1, BPCell = 0, BPDescription = "New Breakpoint Description", BPStart = DateTime.Today.ToString("MM/dd/yyyy"), BPFinish = DateTime.Now.AddMonths(3).ToString("MM/dd/yyyy"), BPCellNumber = retCellFromBPID(1) });
+            BPClass.Add(new Breakpoint { BPID = BPClass[BPClass.Count-1].BPID+1, BPCell = 0, BPDescription = "New Breakpoint Description", BPStart = DateTime.Today.ToString("MM/dd/yyyy"), BPFinish = DateTime.Now.AddMonths(3).ToString("MM/dd/yyyy"), BPCellNumber = retCellFromBPID(0) });
             saveFile();
 
             BPList.SelectedIndex = BPClass.Count - 1;
