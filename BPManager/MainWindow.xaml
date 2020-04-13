@@ -1,0 +1,106 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BPManager"
+        xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="BPManager.ExitEventHandler"
+        mc:Ignorable="d"
+        Title="Breakpoint Manager"
+        Height="600" 
+        Width="800"
+        WindowStartupLocation="CenterScreen"
+        >
+
+
+
+    <Grid Background="#FF807C7C" Width="800" Height="600">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="270" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Menu HorizontalAlignment="Left" VerticalAlignment="Top" Width="700" Grid.ColumnSpan="2">
+
+            <MenuItem Header="File">
+                <MenuItem Header="New Breakpoint" HorizontalAlignment="Left" Width="200" Click="ButtonNew_Click"/>
+                <MenuItem Header="Edit Breakpoint" HorizontalAlignment="Left" Width="200" Click="ButtonEdit_Click"/>
+                <MenuItem Header="Delete Breakpoint" HorizontalAlignment="Left" Width="200" Click="ButtonDelete_Click"/>
+                <Separator HorizontalAlignment="Left" Width="140" />
+                <MenuItem Header="Exit" HorizontalAlignment="Left" Width="200" Click="MenuItem_Click" />
+            </MenuItem>
+            <MenuItem Header="Settings">
+                <MenuItem Header="Edit Cells" x:Name="menuEditCells" Click="MenuEditCells_Click" />
+            </MenuItem>
+
+        </Menu>
+
+
+        <StackPanel>
+
+            <ListBox x:Name="BPList" Grid.Column="0" Margin="10,50,10,10" Height="400" VerticalAlignment="Top"  SelectionChanged="BPList_SelectionChanged" >
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="0 0 0 5">
+                            <TextBlock Text="{Binding BPCellNumber}"/>
+                            <TextBlock FontWeight="Bold" Text="{Binding BPDescription}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="10" Text="{Binding BPStart}"></TextBlock>
+                                <TextBlock FontSize="10" Text=" - "></TextBlock>
+                                <TextBlock FontSize="10" Text="{Binding BPFinish}"></TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+
+            <Button x:Name="buttonNew" Content="New" Margin="10" Width="150" Height="30" FontSize="16" Click="ButtonNew_Click"/>
+            <Button x:Name="buttonDelete" Content="Delete" Margin="10" Width="150" Height="30" FontSize="16" Click="ButtonDelete_Click" />
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" Grid.Column="1">
+            <StackPanel Orientation="Horizontal" Margin="0,100,0,0" HorizontalAlignment="Center">
+                <TextBlock Text="Breakpoint Number:" Margin="10" FontSize="16" TextAlignment="Right" Width="140"/>
+                <TextBox x:Name="textBPNumber" Width="290" FontSize="16" IsReadOnly="True" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+                <TextBlock Text="Breakpoint Cell:" Margin="10" FontSize="16" TextAlignment="Right" Width="140" />
+                <ComboBox x:Name="comboBPCell" Width="290" FontSize="16" IsReadOnly="True" SelectionChanged="ComboBPCell_SelectionChanged">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding CellTitle}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+                <TextBlock Text="Breakpoint Description:" Margin="10" FontSize="16" TextWrapping="Wrap" TextAlignment="Right" Width="140" />
+                <TextBox x:Name="textBPDescription" Width="290" Height="200" TextWrapping="Wrap" FontSize="16" IsReadOnly="True" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+                <TextBlock Text="Date Started:" Margin="10" TextAlignment="Right" FontSize="16" Width="140" />
+                <DatePicker x:Name="dateBPStarted" Height="25" Width="290" FontSize="16" BorderThickness="0" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+                <TextBlock Text="Date Finished:" Margin="10" TextAlignment="Right" FontSize="16" Width="140" />
+                <DatePicker x:Name="dateBPFinished" Height="25" Width="290" FontSize="16"  BorderThickness="0" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+                <Button x:Name="buttonEdit" Margin="10" Content="Edit" Width="150" Height="30" FontSize="16" Click="ButtonEdit_Click" />
+                <Button x:Name="buttonSave" Margin="10" Content="Save" Width="150" Height="30" FontSize="16" IsEnabled="False" Click="ButtonSave_Click" />
+            </StackPanel>
+
+        </StackPanel>
+
+    </Grid>
+</Window>
