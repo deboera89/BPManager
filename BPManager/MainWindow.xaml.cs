@@ -165,7 +165,7 @@ namespace BPManager
             {
                 if (cell == item.CellTitle.ToString()) return item.CellID;
             }
-            return 1;
+            return 0;
 
 
         }
@@ -260,9 +260,12 @@ namespace BPManager
         private void ButtonNew_Click(object sender, RoutedEventArgs e)
         {
 
-            BPClass.Add(new Breakpoint { BPID = BPClass[BPClass.Count-1].BPID+1, BPCell = 1, BPDescription = "test", BPStart = "02/02/2002", BPFinish = "02/02/2002", BPCellNumber = retCellFromBPID(1) });
-
+            BPClass.Add(new Breakpoint { BPID = BPClass[BPClass.Count-1].BPID+1, BPCell = 0, BPDescription = "New Breakpoint Description", BPStart = DateTime.Today.ToString("MM/dd/yyyy"), BPFinish = DateTime.Now.AddMonths(3).ToString("MM/dd/yyyy"), BPCellNumber = retCellFromBPID(1) });
             saveFile();
+
+            BPList.SelectedIndex = BPClass.Count - 1;
+            BPList.Focus();
+
         }
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
