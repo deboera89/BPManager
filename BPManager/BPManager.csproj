@@ -80,6 +80,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\Breakpoint.cs" />
+    <Compile Include="Properties\BreakpointManager.cs" />
     <Compile Include="Properties\Cells.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
