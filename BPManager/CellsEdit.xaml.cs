@@ -41,13 +41,15 @@ namespace BPManager
 
         private void buttonDelete_Click(object sender, RoutedEventArgs e)
         {
+            if (comboCellsList.SelectedIndex >= 0)
             cells.RemoveAt(comboCellsList.SelectedIndex);
 
         }
 
         private void buttonAdd_Click(object sender, RoutedEventArgs e)
         {
-            int x = cells[cells.Count - 1].CellID + 1;
+
+            int x = (cells.Count > 0) ? cells[cells.Count - 1].CellID + 1 : 1;
             cells.Add(new Cells { CellID = x, CellTitle = textNewCellName.Text });
 
         }
