@@ -13,16 +13,17 @@
             <ListBox x:Name="comboCellsList" Width="200" Height="300" Margin="10">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding CellTitle}" />
+                        <TextBlock Text="{Binding CellTitle}" FontSize="16" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Button x:Name="buttonDelete" Content="Delete" Width="200" Height="25" Margin="10,0,10,10" Click="buttonDelete_Click"/>
+
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBox x:Name="textNewCellName"  Width="145"/>
-                <Button  x:Name="buttonAdd"  Content="Add" Width="50" Margin="5" Height="25" Click="buttonAdd_Click"/>
+                <TextBox x:Name="textNewCellName"  Height="30" Width="140" FontSize="16" />
+                <Button  x:Name="buttonAdd"  Content="Add" Width="50" Margin="5" Height="30" Click="buttonAdd_Click"/>
             </StackPanel>
-            <Button x:Name="buttonClose" Content="Close" Width="200" Height="25" Margin="10" Click="buttonClose_Click"/>
+            <Button x:Name="buttonDelete" Content="Delete" Width="200" Height="25" Margin="5" Click="buttonDelete_Click"/>
+            <Button x:Name="buttonClose" Content="Close" Width="200" Height="25" Margin="5" Click="buttonClose_Click"/>
         </StackPanel>
     </Grid>
 </Window>
