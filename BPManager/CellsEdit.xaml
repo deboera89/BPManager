@@ -10,7 +10,7 @@
         >
     <Grid Background="#FF807C7C">
         <StackPanel HorizontalAlignment="Center">
-            <ListBox x:Name="comboCellsList" Width="200" Height="300" Margin="10">
+            <ListBox x:Name="comboCellsList" Width="200" Height="300" Margin="10" >
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding CellTitle}" FontSize="16" />

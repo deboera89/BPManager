@@ -24,16 +24,18 @@ namespace BPManager
     public partial class CellsEdit : Window
     {
         ObservableCollection<Cells> cells;
+        ObservableCollection<Breakpoint> BPClass;
 
         public CellsEdit()
         {
             InitializeComponent();
         }
 
-        public CellsEdit(ObservableCollection<Cells> cells)
+        public CellsEdit(ObservableCollection<Cells> cells, ObservableCollection<Breakpoint> BPClass)
         {
             InitializeComponent();
             this.cells = cells;
+            this.BPClass = BPClass;
 
             comboCellsList.ItemsSource = this.cells;
 
@@ -41,16 +43,30 @@ namespace BPManager
 
         private void buttonDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (comboCellsList.SelectedIndex >= 0)
-            cells.RemoveAt(comboCellsList.SelectedIndex);
+            Cells selectedCell = comboCellsList.SelectedItem as Cells;
+            if (selectedCell == null) return;
+
+            List<Breakpoint> affectedCells = new List<Breakpoint>(BPClass.ToList().FindAll(x => x.BPCell == selectedCell.CellID));
+
+            if (affectedCells.Count == 0)
+            {
+                    cells.RemoveAt(comboCellsList.SelectedIndex);
+            } else
+            {
+                MessageBox.Show($"Error: \nThis cell is used in {affectedCells.Count} breakpoints. Please delete breakpoints before deleting cell.", "Can't delete cell.");
+            }
+
 
         }
 
         private void buttonAdd_Click(object sender, RoutedEventArgs e)
         {
-
-            int x = (cells.Count > 0) ? cells[cells.Count - 1].CellID + 1 : 1;
-            cells.Add(new Cells { CellID = x, CellTitle = textNewCellName.Text });
+            if (textNewCellName.Text != String.Empty)
+            {
+                int x = (cells.Count > 0) ? cells[cells.Count - 1].CellID + 1 : 1;
+                cells.Add(new Cells { CellID = x, CellTitle = textNewCellName.Text });
+            }
+            textNewCellName.Text = String.Empty;
 
         }
 
@@ -59,5 +75,6 @@ namespace BPManager
             this.Close();
             
         }
+
     }
 }

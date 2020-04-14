@@ -80,7 +80,7 @@
 
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
                 <TextBlock Text="Breakpoint Area:" Margin="10" FontSize="16" TextAlignment="Right" Width="140" />
-                <ComboBox x:Name="comboBPCell" Width="290" FontSize="16" >
+                <ComboBox x:Name="comboBPCell" Width="290" FontSize="16" IsEnabled="False" >
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding CellTitle}" />
@@ -96,12 +96,12 @@
 
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
                 <TextBlock Text="Date Started:" Margin="10" TextAlignment="Right" FontSize="16" Width="140" />
-                <DatePicker x:Name="dateBPStarted" Height="25" Width="290" FontSize="16" BorderThickness="0" />
+                <DatePicker x:Name="dateBPStarted" Height="25" Width="290" FontSize="16" BorderThickness="0" IsEnabled="False" />
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
                 <TextBlock Text="Date Finished:" Margin="10" TextAlignment="Right" FontSize="16" Width="140" />
-                <DatePicker x:Name="dateBPFinished" Height="25" Width="290" FontSize="16"  BorderThickness="0" />
+                <DatePicker x:Name="dateBPFinished" Height="25" Width="290" FontSize="16"  BorderThickness="0" IsEnabled="False"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">

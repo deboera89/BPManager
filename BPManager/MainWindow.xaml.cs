@@ -37,6 +37,7 @@ namespace BPManager
 
         // globals
 
+        // observable collections over normal List<> so the items using these as data sources will update real time. 
         ObservableCollection<Breakpoint> BPClass;
         ObservableCollection<Cells> BPCells;
         ObservableCollection<Cells> BPSearchCells;
@@ -63,12 +64,16 @@ namespace BPManager
             BPCells.CollectionChanged += BPCells_CollectionChanged;
             BPClass = new ObservableCollection<Breakpoint> { };
 
+            // sets the BPClass from the loaded xml save file
             BPClass = LoadXML(BPClass);
+
+            // listSearch is the itemsource for the for hte breakpoint list on the main form.
             listSearch = BPClass;
 
             AddListItems();
 
 
+            // after this bool is true we know BPCells and BPClass is filled so can start checking if there is changes made to them.
             finishedLoading = true;
 
 
@@ -76,6 +81,8 @@ namespace BPManager
 
         private void BPCells_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            // update the GUI if Cells are added or deleted from the Edit Cells page
+
             if (finishedLoading)
             {
                 saveFile();
@@ -87,6 +94,7 @@ namespace BPManager
 
         public void updateCellsList()
         {
+            // mainly used if a cell is deleted, loop through the BPClass and update all the cell numbers (to empty if a cell was deleted with a breakpoint attached to that cell)
             for (int x = 0; x <= BPClass.Count-1; x++)
             {
                 BPClass[x].BPCellNumber = RetCellFromBPID(BPClass[x].BPCell);
@@ -95,17 +103,18 @@ namespace BPManager
         }
 
         public void noSaveFile()
-        {
+        { 
+            // small function to create a blank XML datafile if the program can't find it at load up. 
+
             MessageBoxResult dialogResult = MessageBox.Show("No data file found, do you want to create a new data file?", "No Data File", MessageBoxButton.YesNo);
             if (dialogResult == MessageBoxResult.Yes)
             {
-                string fileoutput = "";
-                fileoutput += "<breakpoints>\n";
-                fileoutput += "</breakpoints>";
+                StringBuilder fileoutput = new StringBuilder();
+                fileoutput.Append("<breakpoints>\n");
+                fileoutput.Append("</breakpoints>");
 
-              //  File.Create(saveName);
-
-                File.WriteAllLines(saveName, fileoutput.Split('\n'));
+                File.WriteAllLines(saveName, fileoutput.ToString().Split('\n'));
+                fileoutput.Clear();
             }
             else if (dialogResult == MessageBoxResult.No)
             {
@@ -118,14 +127,14 @@ namespace BPManager
         private ObservableCollection<Breakpoint> LoadXML(ObservableCollection<Breakpoint> BPClass)
         {
 
+        // reads XML datafile and sets up the BPClass and BPCells lists. 
+
         bool insideBreakpoint = false;
         bool insideCell = false;
 
         Breakpoint newBreakpoint = new Breakpoint();
         Cells newCell = new Cells();
 
-
-          //  Console.WriteLine(File.Exists(saveName) ? "File exists." : "File does not exist.");
             if (!File.Exists(saveName)) noSaveFile();
 
 
@@ -208,12 +217,20 @@ namespace BPManager
         private void AddListItems()
         {
 
+            // add items to the lists and combo boxes
+
             BPList.ItemsSource = listSearch;
 
             comboBPCell.ItemsSource = BPCells;
 
+            // the filter/search list box has a new item added to it for us to clear the search box
+
             BPSearchCells = new ObservableCollection<Cells>(BPCells);
-            BPSearchCells.Add(new Cells { CellID = -1, CellTitle = "Clear" });
+
+            int newCID = (BPSearchCells.Count > 0) ? BPSearchCells[BPSearchCells.Count - 1].CellID + 1 : 1;
+
+            BPSearchCells.Add(new Cells { CellID = newCID, CellTitle = "Clear" });
+
             comboSearchList.ItemsSource = BPSearchCells;
 
 
@@ -238,7 +255,7 @@ namespace BPManager
 
         private string RetCellFromBPID(int ID)
         {
-            // this function goes through the BPCellsID list and returns the cell number of the specified ID. 
+            // this function goes through the BPCellsID list and returns the cell string title of the specified ID. 
             foreach (var item in BPCells)
             {
                 if (ID == item.CellID) return item.CellTitle;
@@ -251,6 +268,7 @@ namespace BPManager
 
         private int RetListIDFromBPID(int BPID)
         {
+            // this function loops through the BPClass list and finds where the specified BPID is located and returns the Index number.
             for (int x = 0; x <= BPClass.Count-1; x++)
             {
                 if (BPID == BPClass[x].BPID) return x;
@@ -261,12 +279,11 @@ namespace BPManager
 
         private void BPList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // update the info fields with the data from the selected index on BPList
 
             if (BPList.SelectedIndex >= 0)
             {
-                // update the info fields with the data from the selected index on BPList
                 Breakpoint selectedBreakpoint = BPList.SelectedItem as Breakpoint;
-
                 textBPNumber.Text = selectedBreakpoint.BPID.ToString();
 
                 comboBPCell.SelectedIndex = (BPCells.ToList().Exists(x => x.CellID == selectedBreakpoint.BPCell)) ? (ReturnIDFromDropDown(selectedBreakpoint.BPCellNumber)) : -1;
@@ -275,6 +292,16 @@ namespace BPManager
                 dateBPStarted.SelectedDate = DateTime.Parse(selectedBreakpoint.BPStart);
                 dateBPFinished.SelectedDate = DateTime.Parse(selectedBreakpoint.BPFinish);
 
+            } else
+            {
+                // if none selected (usually after a breakpoint is deleted) then clear all values
+
+                textBPDescription.Text = String.Empty;
+                textBPNumber.Text = String.Empty;
+                comboBPCell.SelectedIndex = -1;
+                dateBPStarted.SelectedDate = null;
+                dateBPFinished.SelectedDate = null;
+
             }
 
 
@@ -282,44 +309,58 @@ namespace BPManager
 
         private void ButtonEdit_Click(object sender, RoutedEventArgs e)
         {
+            // enable all info fields if edit button is clicked
+
             textBPDescription.IsReadOnly = false;
+            comboBPCell.IsEnabled = true;
             buttonSave.IsEnabled = true;
             dateBPStarted.IsEnabled = true;
             dateBPFinished.IsEnabled = true;
+            
 
         }
 
         private void saveFile()
         {
-            string fileoutput = "<breakpoints>\n";
+            // save the current BPClass and BPCells to the xml file.
+
+            StringBuilder fileoutput = new StringBuilder();
+
+            fileoutput.Append("<breakpoints>\n");
             int currentID = 0;
 
             foreach (var item in BPCells)
             { 
-                fileoutput += "\t<cell>\n";
-                fileoutput += $"\t\t<id>{item.CellID}</id>\n";
-                fileoutput += $"\t\t<title>{item.CellTitle}</title>\n";
-                fileoutput += "\t</cell>\n";
+                fileoutput.Append("\t<cell>\n");
+                fileoutput.Append($"\t\t<id>{item.CellID}</id>\n");
+                fileoutput.Append($"\t\t<title>{item.CellTitle}</title>\n");
+                fileoutput.Append("\t</cell>\n");
+
                 currentID++;
             }
 
             foreach (var item in BPClass)
             {
-                fileoutput += "\t<breakpoint>\n";
-                fileoutput += $"\t\t<id>{item.BPID}</id>\n";
-                fileoutput += $"\t\t<cellid>{item.BPCell}</cellid>\n";
-                fileoutput += $"\t\t<description>{item.BPDescription}</description>\n";
-                fileoutput += $"\t\t<datestarted>{item.BPStart}</datestarted>\n";
-                fileoutput += $"\t\t<datefinished>{item.BPFinish}</datefinished>\n";
-                fileoutput += "\t</breakpoint>\n";
+                fileoutput.Append("\t<breakpoint>\n");
+                fileoutput.Append($"\t\t<id>{item.BPID}</id>\n");
+                fileoutput.Append($"\t\t<cellid>{item.BPCell}</cellid>\n");
+                fileoutput.Append($"\t\t<description>{item.BPDescription}</description>\n");
+                fileoutput.Append($"\t\t<datestarted>{item.BPStart}</datestarted>\n");
+                fileoutput.Append($"\t\t<datefinished>{item.BPFinish}</datefinished>\n");
+                fileoutput.Append("\t</breakpoint>\n");
             }
 
-            fileoutput += "</breakpoints>";
-            System.IO.File.WriteAllLines(saveName, fileoutput.Split('\n'));
+            fileoutput.Append("</breakpoints>");
+            System.IO.File.WriteAllLines(saveName, fileoutput.ToString().Split('\n'));
+
+            fileoutput.Clear();
+
         }
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
+            // edit the breakpoint BPClass with the new data and save to the xml file
+
             Breakpoint selectedBreakpoint = BPList.SelectedItem as Breakpoint;
 
             if (selectedBreakpoint != null) {
@@ -331,31 +372,39 @@ namespace BPManager
                 BPClass[BPClassIndex].BPFinish = DateTime.Parse(dateBPFinished.SelectedDate.ToString()).ToString("MM/dd/yyyy");
                 BPClass[BPClassIndex].BPCellNumber = RetCellFromBPID(BPClass[BPClassIndex].BPCell);
 
-
                 saveFile();
 
                 UpdateListSearch();
-
-
                 BPList.SelectedIndex = selected;
             }
+
+            // once save is finished, disable all the info fields
+            textBPDescription.IsReadOnly = true;
+            comboBPCell.IsEnabled = false;
             buttonSave.IsEnabled = false;
+            dateBPStarted.IsEnabled = false;
+            dateBPFinished.IsEnabled = false;
 
         }
 
         private void ButtonNew_Click(object sender, RoutedEventArgs e)
         {
-            Cells selectedCell = comboSearchList.SelectedItem as Cells;
+            // creates a new breakpoint and adds it to the BPClass list
 
+            // if the search/filter combo box is being used, add the new breakpoint with the selected cell id, otherwise set cell id to 0 (empty)
+            Cells selectedCell = comboSearchList.SelectedItem as Cells;
             int newCellID = (comboSearchList.SelectedIndex >= 0 && comboSearchList.SelectedIndex < BPSearchCells.Count()-1) ? selectedCell.CellID : 0;
+
+            // get the last BPID in the BPClass and add 1 to it to get new BPID, if there is no breakpoints in the list then set new BPID to 1.
             int newBPID = (BPClass.Count > 0) ? BPClass[BPClass.Count - 1].BPID + 1 : 1;
 
 
-
             BPClass.Add(new Breakpoint { BPID = newBPID, BPCell = newCellID, BPDescription = "New Breakpoint Description", BPStart = DateTime.Today.ToString("MM/dd/yyyy"), BPFinish = DateTime.Now.AddMonths(3).ToString("MM/dd/yyyy"), BPCellNumber = RetCellFromBPID(newCellID) });
-            saveFile();
 
+
+            saveFile();
             UpdateListSearch();
+
 
             BPList.SelectedIndex = BPList.Items.Count - 1;
             BPList.Focus();
@@ -364,41 +413,54 @@ namespace BPManager
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
+            // delete the selected breakpoint from the BPClass list
+            
             Breakpoint selectedBreakpoint = BPList.SelectedItem as Breakpoint;
 
-
-            BPClass.RemoveAt(RetListIDFromBPID(selectedBreakpoint.BPID));
-
-            saveFile();
-            UpdateListSearch();
-
+            if (selectedBreakpoint != null)
+            {
+                BPClass.RemoveAt(RetListIDFromBPID(selectedBreakpoint.BPID));
+                saveFile();
+                UpdateListSearch();
+            }
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
+            // exits application
             this.Close();
         }
 
         private void MenuEditCells_Click(object sender, RoutedEventArgs e)
         {
-            new CellsEdit(BPCells).Show();
+            // opens settings, pass BPCells & BPClass through so we can add Cells from the settings 
+            new CellsEdit(BPCells, BPClass).Show();
+
         }
 
 
         private void UpdateListSearch()
-        { 
+        {
+            // if a selection is made from the filter/search combo box then update the BPList to show the selected Cell.
+            // The last item in BPSearchCells is the "Clear" item to remove the filter.
+
+
 
 
             if (comboSearchList.SelectedIndex >= 0 && comboSearchList.SelectedIndex <= BPSearchCells.Count - 2)
             {
+                Console.WriteLine(comboSearchList.SelectedIndex);
                 Cells selectedCell = comboSearchList.SelectedItem as Cells;
                 listSearch = new ObservableCollection<Breakpoint>(BPClass.ToList().FindAll(x => x.BPCell == selectedCell.CellID));
 
             } else
             {
+                // search criteria was removed so show all breakpoints
+
                 listSearch = new ObservableCollection<Breakpoint>(BPClass);
             }
 
+            // update listitems
             AddListItems();
 
         }
