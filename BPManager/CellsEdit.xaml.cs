@@ -3,16 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace BPManager
 {
@@ -34,6 +25,7 @@ namespace BPManager
         public CellsEdit(ObservableCollection<Cells> cells, ObservableCollection<Breakpoint> BPClass)
         {
             InitializeComponent();
+
             this.cells = cells;
             this.BPClass = BPClass;
 
@@ -43,17 +35,21 @@ namespace BPManager
 
         private void buttonDelete_Click(object sender, RoutedEventArgs e)
         {
+            // delete a cell from the cells list
+
             Cells selectedCell = comboCellsList.SelectedItem as Cells;
             if (selectedCell == null) return;
 
+            // Check the BPClass list to see if any breakpoints have the selected cell as a CellID
             List<Breakpoint> affectedCells = new List<Breakpoint>(BPClass.ToList().FindAll(x => x.BPCell == selectedCell.CellID));
 
             if (affectedCells.Count == 0)
             {
-                    cells.RemoveAt(comboCellsList.SelectedIndex);
-            } else
+                cells.RemoveAt(comboCellsList.SelectedIndex);
+            }
+            else
             {
-                MessageBox.Show($"Error: \nThis cell is used in {affectedCells.Count} breakpoints. Please delete breakpoints before deleting cell.", "Can't delete cell.");
+                MessageBox.Show($"Error: \nThis cell is used in {affectedCells.Count} breakpoints.\nPlease delete breakpoints before deleting cell.", "Can't delete cell.");
             }
 
 
@@ -61,6 +57,8 @@ namespace BPManager
 
         private void buttonAdd_Click(object sender, RoutedEventArgs e)
         {
+            // add a new cell the cells list
+
             if (textNewCellName.Text != String.Empty)
             {
                 int x = (cells.Count > 0) ? cells[cells.Count - 1].CellID + 1 : 1;
@@ -73,7 +71,7 @@ namespace BPManager
         private void buttonClose_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
-            
+
         }
 
     }
