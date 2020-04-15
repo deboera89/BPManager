@@ -54,13 +54,17 @@
             <ListBox x:Name="BPList" Grid.Column="0" Margin="10,5,10,10" Height="360" VerticalAlignment="Top"  SelectionChanged="BPList_SelectionChanged" >
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Margin="0 0 0 5">
-                            <TextBlock Text="{Binding BPCellNumber}"/>
+                        <StackPanel Margin="0,0,0,5">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding BPID}" />
+                                 <TextBlock FontSize="10" Text=", " /> 
+                                <TextBlock Text="{Binding BPCellNumber}" />
+                            </StackPanel>
                             <TextBlock FontWeight="Bold" Text="{Binding BPDescription}"/>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock FontSize="10" Text="{Binding BPStart}"></TextBlock>
-                                <TextBlock FontSize="10" Text=" - "></TextBlock>
-                                <TextBlock FontSize="10" Text="{Binding BPFinish}"></TextBlock>
+                                <TextBlock FontSize="10" Text="{Binding BPStart}" />
+                                <TextBlock FontSize="10" Text=" - " /> 
+                                <TextBlock FontSize="10" Text="{Binding BPFinish}" />
                             </StackPanel>
                         </StackPanel>
                     </DataTemplate>
