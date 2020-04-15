@@ -79,9 +79,9 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Breakpoint.cs" />
-    <Compile Include="Properties\BreakpointManager.cs" />
-    <Compile Include="Properties\Cells.cs" />
+    <Compile Include="Classes\Breakpoint.cs" />
+    <Compile Include="Classes\BreakpointManager.cs" />
+    <Compile Include="Classes\Cells.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -103,9 +103,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="datafile.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
