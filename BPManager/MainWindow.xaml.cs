@@ -1,22 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Collections.ObjectModel;
 using BPManager.Properties;
-using System.Collections.Specialized;
-using System.Data;
-using System.IO;
 
 namespace BPManager
 {
@@ -27,7 +13,7 @@ namespace BPManager
 
 
 
-    public partial class ExitEventHandler : Window
+    public partial class MainWindow : Window
     {
 
 
@@ -36,9 +22,10 @@ namespace BPManager
         BreakpointManager BPManager = new BreakpointManager();
 
 
-        public ExitEventHandler()
+        public MainWindow()
         {
             InitializeComponent();
+
             BPManager.start();
 
             BPList.ItemsSource = BPManager.listSearch;
@@ -47,7 +34,8 @@ namespace BPManager
 
             comboSearchList.ItemsSource = BPManager.BPSearchCells;
 
-            comboSearchList.SelectedIndex = comboSearchList.Items.Count - 1;
+            // set the Filter to the first item ("Show All")
+            comboSearchList.SelectedIndex = 0;
 
         }
 
@@ -58,15 +46,15 @@ namespace BPManager
             if (BPList.SelectedIndex >= 0)
             {
                 Breakpoint selectedBreakpoint = BPList.SelectedItem as Breakpoint;
+
                 textBPNumber.Text = selectedBreakpoint.BPID.ToString();
-
                 comboBPCell.SelectedIndex = (BPManager.BPCells.ToList().Exists(x => x.CellID == selectedBreakpoint.BPCell)) ? (BPManager.ReturnIDFromDropDown(selectedBreakpoint.BPCellNumber)) : -1;
-
                 textBPDescription.Text = selectedBreakpoint.BPDescription;
                 dateBPStarted.SelectedDate = DateTime.Parse(selectedBreakpoint.BPStart);
                 dateBPFinished.SelectedDate = DateTime.Parse(selectedBreakpoint.BPFinish);
 
-            } else
+            }
+            else
             {
                 // if none selected (usually after a breakpoint is deleted) then clear all values
 
@@ -84,13 +72,14 @@ namespace BPManager
         private void ButtonEdit_Click(object sender, RoutedEventArgs e)
         {
             // enable all info fields if edit button is clicked
-
-            textBPDescription.IsReadOnly = false;
-            comboBPCell.IsEnabled = true;
-            buttonSave.IsEnabled = true;
-            dateBPStarted.IsEnabled = true;
-            dateBPFinished.IsEnabled = true;
-            
+            if (BPList.SelectedIndex >= 0)
+            {
+                textBPDescription.IsReadOnly = false;
+                comboBPCell.IsEnabled = true;
+                buttonSave.IsEnabled = true;
+                dateBPStarted.IsEnabled = true;
+                dateBPFinished.IsEnabled = true;
+            }
 
         }
 
@@ -101,18 +90,11 @@ namespace BPManager
 
             Breakpoint selectedBreakpoint = BPList.SelectedItem as Breakpoint;
 
-            if (selectedBreakpoint != null) {
+            if (selectedBreakpoint != null)
+            {
                 int selected = BPList.SelectedIndex;
-                int BPClassIndex = BPManager.ReturnCellFromBreakpointCellID(selectedBreakpoint.BPID);
-                BPManager.BPClass[BPClassIndex].BPCell = BPManager.BPCells[comboBPCell.SelectedIndex].CellID;
-                BPManager.BPClass[BPClassIndex].BPDescription = textBPDescription.Text;
-                BPManager.BPClass[BPClassIndex].BPStart = DateTime.Parse(dateBPStarted.SelectedDate.ToString()).ToString("MM/dd/yyyy");
-                BPManager.BPClass[BPClassIndex].BPFinish = DateTime.Parse(dateBPFinished.SelectedDate.ToString()).ToString("MM/dd/yyyy");
-                BPManager.BPClass[BPClassIndex].BPCellNumber = BPManager.RetCellFromCID(BPManager.BPClass[BPClassIndex].BPCell);
 
-                BPManager.SaveFile();
-
-                BPManager.UpdateListSearch(comboSearchList.SelectedItem as Cells);
+                BPManager.EditBreakpoint(selectedBreakpoint, textBPDescription.Text, dateBPStarted.SelectedDate.ToString(), dateBPFinished.SelectedDate.ToString(), comboBPCell.SelectedIndex);
 
                 BPList.SelectedIndex = selected;
             }
@@ -130,7 +112,7 @@ namespace BPManager
         {
             // creates a new breakpoint and adds it to the BPClass list
 
-            // if the search/filter combo box is being used, pass the reference along
+            // if the search/filter combo box is being used, pass the reference along to create new breakpoint to the shown cell
             Cells selectedCell = comboSearchList.SelectedItem as Cells;
             BPManager.AddNewBreakpoint(selectedCell);
 
