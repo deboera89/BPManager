@@ -30,6 +30,7 @@ namespace BPManager
             comboSearchList.ItemsSource = BPManager.GetBPSearchCells();
 
             // set the Filter to the first item ("Show All")
+
             comboSearchList.SelectedIndex = 0;
 
         }
