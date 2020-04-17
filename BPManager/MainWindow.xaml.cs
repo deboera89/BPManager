@@ -16,23 +16,18 @@ namespace BPManager
     public partial class MainWindow : Window
     {
 
-
-
         // observable collections over normal List<> so the items using these as data sources will update real time. 
-        BreakpointManager BPManager = new BreakpointManager();
 
+        BreakpointManager BPManager = new BreakpointManager();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            BPManager.start();
 
-            BPList.ItemsSource = BPManager.listSearch;
-
-            comboBPCell.ItemsSource = BPManager.BPCells;
-
-            comboSearchList.ItemsSource = BPManager.BPSearchCells;
+            BPList.ItemsSource = BPManager.GetListSearch();
+            comboBPCell.ItemsSource = BPManager.GetBPCells();
+            comboSearchList.ItemsSource = BPManager.GetBPSearchCells();
 
             // set the Filter to the first item ("Show All")
             comboSearchList.SelectedIndex = 0;
@@ -48,7 +43,7 @@ namespace BPManager
                 Breakpoint selectedBreakpoint = BPList.SelectedItem as Breakpoint;
 
                 textBPNumber.Text = selectedBreakpoint.BPID.ToString();
-                comboBPCell.SelectedIndex = (BPManager.BPCells.ToList().Exists(x => x.CellID == selectedBreakpoint.BPCell)) ? (BPManager.ReturnIDFromDropDown(selectedBreakpoint.BPCellNumber)) : -1;
+                comboBPCell.SelectedIndex = (BPManager.GetBPCells().ToList().Exists(x => x.CellID == selectedBreakpoint.BPCell)) ? (BPManager.ReturnIDFromDropDown(selectedBreakpoint.BPCellNumber)) : -1;
                 textBPDescription.Text = selectedBreakpoint.BPDescription;
                 dateBPStarted.SelectedDate = DateTime.Parse(selectedBreakpoint.BPStart);
                 dateBPFinished.SelectedDate = DateTime.Parse(selectedBreakpoint.BPFinish);
@@ -89,13 +84,12 @@ namespace BPManager
             // edit the breakpoint BPClass with the new data and save to the xml file
 
             Breakpoint selectedBreakpoint = BPList.SelectedItem as Breakpoint;
+            Cells selectedCell = comboSearchList.SelectedItem as Cells;
 
             if (selectedBreakpoint != null)
             {
                 int selected = BPList.SelectedIndex;
-
-                BPManager.EditBreakpoint(selectedBreakpoint, textBPDescription.Text, dateBPStarted.SelectedDate.ToString(), dateBPFinished.SelectedDate.ToString(), comboBPCell.SelectedIndex);
-
+                BPManager.EditBreakpoint(selectedCell, selectedBreakpoint, textBPDescription.Text, dateBPStarted.SelectedDate.ToString(), dateBPFinished.SelectedDate.ToString(), comboBPCell.SelectedIndex);
                 BPList.SelectedIndex = selected;
             }
 
@@ -139,7 +133,7 @@ namespace BPManager
         private void MenuEditCells_Click(object sender, RoutedEventArgs e)
         {
             // opens settings, pass BPCells & BPClass through so we can add Cells from the settings 
-            new CellsEdit(BPManager.BPCells, BPManager.BPClass).Show();
+            new CellsEdit(BPManager.GetBPCells(), BPManager.GetBPClass()).Show();
 
         }
 

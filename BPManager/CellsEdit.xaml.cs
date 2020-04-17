@@ -49,7 +49,8 @@ namespace BPManager
             }
             else
             {
-                MessageBox.Show($"Error: \nThis cell is used in {affectedCells.Count} breakpoints.\nPlease delete breakpoints before deleting cell.", "Can't delete cell.");
+                var bpAmount = (affectedCells.Count > 1) ? "breakpoints" : "breakpoint";
+                MessageBox.Show($"Error: \nThis cell is used in {affectedCells.Count} {bpAmount}.\nPlease delete {bpAmount} before deleting cell.", "Can't delete cell.");
             }
 
 
