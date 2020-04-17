@@ -19,9 +19,7 @@ namespace BPManager.Properties
         private ObservableCollection<Cells> _bpCells;
         private ObservableCollection<Cells> _bpSearchCells;
 
-
         private bool finishedLoading = false;
-
 
         public BreakpointManager()
         {
@@ -33,8 +31,6 @@ namespace BPManager.Properties
             _bpCells.CollectionChanged += BPCells_CollectionChanged;
 
             _bpClass = new ObservableCollection<Breakpoint> { };
-
-            // sets the BPClass from the loaded xml save file
             if (!LoadXML())
             {
                 // error if xml loaded incorrectly
@@ -44,12 +40,12 @@ namespace BPManager.Properties
 
             }
 
-            // listSearch is the itemsource for the for hte breakpoint list on the main form.
+            // listSearch is the itemsource for the for the breakpoint list on the main form.
+
             _listSearch = new ObservableCollection<Breakpoint>(_bpClass);
 
-
-
             // after this bool is true we know BPCells and BPClass is filled so can start checking if there is changes made to them.
+
             finishedLoading = true;
 
         }
@@ -79,8 +75,8 @@ namespace BPManager.Properties
         private void BPCells_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             // update the GUI if Cells are added or deleted from the Edit Cells page
-
             //Add listener for each item on PropertyChanged event
+
             if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 _bpSearchCells.RemoveAt(e.OldStartingIndex);
@@ -95,11 +91,11 @@ namespace BPManager.Properties
             if (finishedLoading)
             {
                 // only save and update the cell list if a cell is added or removed from the edit cells page, not during the initial loading.
+
                 SaveFile();
                 UpdateCellsList();
 
             }
-
 
         }
 
@@ -124,10 +120,12 @@ namespace BPManager.Properties
         private Cells ReturnCellFromBreakpointCellID(Breakpoint bp)
         {
             // returns a Cells item where the CellID matches the Cell id in the breakpoint
+
             foreach (var item in _bpCells)
             {
                 if (item.CellID == bp.BPCell) return item;
             }
+
             return null;
         }
 
@@ -135,6 +133,7 @@ namespace BPManager.Properties
         private string RetCellFromCID(int ID)
         {
             // this function goes through the BPCells ID list and returns the string title of the specified ID. 
+
             foreach (var item in _bpCells)
             {
                 if (ID == item.CellID) return item.CellTitle;
@@ -147,11 +146,12 @@ namespace BPManager.Properties
         private int ReturnCellFromBreakpointCellID(int BPID)
         {
             // this function loops through the BPClass list and finds where the specified BPID is located and returns the Index number in the list.
+
             for (var x = 0; x <= _bpClass.Count - 1; x++)
             {
                 if (BPID == _bpClass[x].BPID) return x;
-
             }
+
             return -1;
         }
 
@@ -164,8 +164,8 @@ namespace BPManager.Properties
             for (var x = 0; x <= _bpClass.Count - 1; x++)
             {
                 _bpClass[x].BPCellNumber = RetCellFromCID(_bpClass[x].BPCell);
-
             }
+
         }
 
         private void noSaveFile()
@@ -186,6 +186,7 @@ namespace BPManager.Properties
             {
                 Application.Current.Shutdown();
             }
+
         }
 
         public bool DeleteBreakpoint(Breakpoint selectedBreakpoint)
@@ -197,6 +198,7 @@ namespace BPManager.Properties
             SaveFile();
             UpdateListSearch();
             return true;
+
         }
 
         public bool AddNewBreakpoint(Cells cell)
@@ -208,16 +210,14 @@ namespace BPManager.Properties
             int newCellID = cell.CellID;
 
             // get the last BPID in the BPClass and add 1 to it to get new BPID, if there is no breakpoints in the list then set new BPID to 1.
+
             int newBPID = (_bpClass.Count > 0) ? _bpClass[_bpClass.Count - 1].BPID + 1 : 1;
-
-
             _bpClass.Add(new Breakpoint { BPID = newBPID, BPCell = newCellID, BPDescription = "New Breakpoint Description", BPStart = DateTime.Today.ToString("MM/dd/yyyy"), BPFinish = DateTime.Now.AddMonths(3).ToString("MM/dd/yyyy"), BPCellNumber = RetCellFromCID(newCellID) });
-
             SaveFile();
-
             UpdateListSearch(cell, true);
 
             return true;
+
         }
 
         public bool EditBreakpoint(Cells selectedCell, Breakpoint selectedBreakpoint, string description, string started, string finish, int CellIndex)
@@ -227,8 +227,6 @@ namespace BPManager.Properties
             int BPClassIndex = ReturnCellFromBreakpointCellID(selectedBreakpoint.BPID);
 
             _bpClass[BPClassIndex].BPCell = _bpCells[CellIndex].CellID;
-
-
             _bpClass[BPClassIndex].BPDescription = description;
             _bpClass[BPClassIndex].BPStart = DateTime.Parse(started).ToString("MM/dd/yyyy");
             _bpClass[BPClassIndex].BPFinish = DateTime.Parse(finish).ToString("MM/dd/yyyy");
@@ -293,6 +291,7 @@ namespace BPManager.Properties
                             newBreakpoint.BPFinish = reader.ReadString();
                             break;
                     }
+
                 }
 
                 if (insideCell)
@@ -306,6 +305,7 @@ namespace BPManager.Properties
                             newCell.CellTitle = reader.ReadString();
                             break;
                     }
+
                 }
 
                 if (reader.NodeType == System.Xml.XmlNodeType.EndElement && reader.Name.ToString() == "breakpoint")
@@ -327,6 +327,7 @@ namespace BPManager.Properties
 
             reader.Dispose();
             return true;
+
         }
 
 
@@ -337,7 +338,7 @@ namespace BPManager.Properties
             StringBuilder fileoutput = new StringBuilder();
 
             fileoutput.Append("<breakpoints>\n");
-            int currentID = 0;
+
 
             foreach (var item in _bpCells)
             {
@@ -345,8 +346,6 @@ namespace BPManager.Properties
                 fileoutput.Append($"\t\t<id>{item.CellID}</id>\n");
                 fileoutput.Append($"\t\t<title>{item.CellTitle}</title>\n");
                 fileoutput.Append("\t</cell>\n");
-
-                currentID++;
             }
 
             foreach (var item in _bpClass)
@@ -362,7 +361,6 @@ namespace BPManager.Properties
 
             fileoutput.Append("</breakpoints>");
             System.IO.File.WriteAllLines(saveName, fileoutput.ToString().Split('\n'));
-
             fileoutput.Clear();
 
         }
@@ -371,7 +369,6 @@ namespace BPManager.Properties
         {
             // if a selection is made from the filter/search combo box then update the BPList to show the selected Cell.
             // The first item in BPSearchCells is the "Clear" item to remove the filter.
-
             // if no selectedCell is passed, check if the listSearch is smaller than the BPClass to determine if a search/filter was being used.
 
             if (_listSearch.Count <= _bpClass.Count && _listSearch.Count > 0 && selectedCell == null && !addedit)
@@ -411,11 +408,9 @@ namespace BPManager.Properties
             // Adds "Show All" selection to the start of the search combo list itemssource
 
             _bpSearchCells.Add(new Cells { CellID = -1, CellTitle = "Show All" });
-
-
         }
 
-
     }
+
 }
 

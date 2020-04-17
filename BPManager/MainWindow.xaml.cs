@@ -68,6 +68,7 @@ namespace BPManager
         private void ButtonEdit_Click(object sender, RoutedEventArgs e)
         {
             // enable all info fields if edit button is clicked
+
             if (BPList.SelectedIndex >= 0)
             {
                 textBPDescription.IsReadOnly = false;
@@ -95,6 +96,7 @@ namespace BPManager
             }
 
             // once save is finished, disable all the info fields
+
             textBPDescription.IsReadOnly = true;
             comboBPCell.IsEnabled = false;
             buttonSave.IsEnabled = false;
@@ -106,8 +108,8 @@ namespace BPManager
         private void ButtonNew_Click(object sender, RoutedEventArgs e)
         {
             // creates a new breakpoint and adds it to the BPClass list
-
             // if the search/filter combo box is being used, pass the reference along to create new breakpoint to the shown cell
+
             Cells selectedCell = comboSearchList.SelectedItem as Cells;
             BPManager.AddNewBreakpoint(selectedCell);
 
@@ -120,6 +122,7 @@ namespace BPManager
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
             // delete the selected breakpoint from the BPClass list
+
             Breakpoint selectedBreakpoint = BPList.SelectedItem as Breakpoint;
             BPManager.DeleteBreakpoint(selectedBreakpoint);
 
@@ -128,12 +131,14 @@ namespace BPManager
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             // exits application
+
             this.Close();
         }
 
         private void MenuEditCells_Click(object sender, RoutedEventArgs e)
         {
             // opens settings, pass BPCells & BPClass through so we can add Cells from the settings 
+
             new CellsEdit(BPManager.GetBPCells(), BPManager.GetBPClass()).Show();
 
         }
@@ -141,6 +146,7 @@ namespace BPManager
         private void ComboSearchList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // updates the Breakpoint list with the filter
+
             BPManager.UpdateListSearch(comboSearchList.SelectedItem as Cells);
         }
 

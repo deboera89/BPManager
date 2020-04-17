@@ -41,6 +41,7 @@ namespace BPManager
             if (selectedCell == null) return;
 
             // Check the BPClass list to see if any breakpoints have the selected cell as a CellID
+
             List<Breakpoint> affectedCells = new List<Breakpoint>(BPClass.ToList().FindAll(x => x.BPCell == selectedCell.CellID));
 
             if (affectedCells.Count == 0)
