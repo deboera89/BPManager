@@ -1,0 +1,42 @@
+<breakpoints>
+	<cell>
+		<id>1</id>
+		<title>Product 1</title>
+	</cell>
+	<cell>
+		<id>2</id>
+		<title>Product 2</title>
+	</cell>
+	<cell>
+		<id>3</id>
+		<title>Product 3</title>
+	</cell>
+	<breakpoint>
+		<id>1</id>
+		<cellid>1</cellid>
+		<description>New Supplier</description>
+		<datestarted>04/17/2020</datestarted>
+		<datefinished>08/08/2020</datefinished>
+	</breakpoint>
+	<breakpoint>
+		<id>2</id>
+		<cellid>2</cellid>
+		<description>Change of Procedure</description>
+		<datestarted>04/17/2020</datestarted>
+		<datefinished>07/24/2020</datefinished>
+	</breakpoint>
+	<breakpoint>
+		<id>3</id>
+		<cellid>3</cellid>
+		<description>New Operator Packing</description>
+		<datestarted>04/17/2020</datestarted>
+		<datefinished>07/23/2020</datefinished>
+	</breakpoint>
+	<breakpoint>
+		<id>4</id>
+		<cellid>3</cellid>
+		<description>Robot not working, parts manually built</description>
+		<datestarted>04/17/2020</datestarted>
+		<datefinished>07/22/2020</datefinished>
+	</breakpoint>
+</breakpoints>
