@@ -79,7 +79,7 @@ namespace BPManager.Properties
 
             if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                _bpSearchCells.RemoveAt(e.OldStartingIndex);
+                _bpSearchCells.RemoveAt(e.OldStartingIndex+1);
             }
             else if (e.Action == NotifyCollectionChangedAction.Add)
             {
