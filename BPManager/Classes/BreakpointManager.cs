@@ -1,10 +1,13 @@
-﻿using System;
+﻿using BPManager.Classes;
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace BPManager.Properties
 {
@@ -12,17 +15,22 @@ namespace BPManager.Properties
     class BreakpointManager
     {
 
-        public string saveName = "datafile.xml";
 
-        private ObservableCollection<Breakpoint> _bpClass;
-        private ObservableCollection<Breakpoint> _listSearch;
-        private ObservableCollection<Cells> _bpCells;
-        private ObservableCollection<Cells> _bpSearchCells;
+        private string _saveName = "datafile.xml";
+
+        public ObservableCollection<Breakpoint> _bpClass { get; private set; }
+        public ObservableCollection<Breakpoint> _listSearch { get; private set; }
+        public ObservableCollection<Cells> _bpCells { get; private set; }
+        public ObservableCollection<Cells> _bpSearchCells { get; private set; }
 
         private bool finishedLoading = false;
 
-        public BreakpointManager()
+        public BreakpointManager() : this("datafile.xml") { }
+
+
+        public BreakpointManager(string saveName)
         {
+            _saveName = saveName;
             _bpCells = new ObservableCollection<Cells> { };
             _bpSearchCells = new ObservableCollection<Cells> { };
 
@@ -48,27 +56,6 @@ namespace BPManager.Properties
 
             finishedLoading = true;
 
-        }
-
-
-        public ObservableCollection<Breakpoint> GetBPClass()
-        {
-            return _bpClass;
-        }
-
-        public ObservableCollection<Breakpoint> GetListSearch()
-        {
-            return _listSearch;
-        }
-
-        public ObservableCollection<Cells> GetBPCells()
-        {
-            return _bpCells;
-        }
-
-        public ObservableCollection<Cells> GetBPSearchCells()
-        {
-            return _bpSearchCells;
         }
 
 
@@ -157,9 +144,7 @@ namespace BPManager.Properties
 
         private void UpdateCellsList()
         {
-            // mainly used if a cell is deleted, loop through the BPClass and update all the cell numbers (to empty if a cell was deleted with a breakpoint attached to that cell)
-            // this shouldn't be used any more as a check is done on the edit cells page to disallow user to remove Cells with breakpoints attached.
-            // will leave this function here incase i want to add the ability to change cell titles.
+            // loop through the BPClass and update all the cell numbers
 
             for (var x = 0; x <= _bpClass.Count - 1; x++)
             {
@@ -175,12 +160,7 @@ namespace BPManager.Properties
             MessageBoxResult dialogResult = MessageBox.Show("No data file found, do you want to create a new data file?", "No Data File", MessageBoxButton.YesNo);
             if (dialogResult == MessageBoxResult.Yes)
             {
-                StringBuilder fileoutput = new StringBuilder();
-                fileoutput.Append("<breakpoints>\n");
-                fileoutput.Append("</breakpoints>");
-
-                File.WriteAllLines(saveName, fileoutput.ToString().Split('\n'));
-                fileoutput.Clear();
+                SaveFile();
             }
             else if (dialogResult == MessageBoxResult.No)
             {
@@ -245,87 +225,35 @@ namespace BPManager.Properties
 
             // reads XML datafile and sets up the BPClass and BPCells lists. 
 
-            var insideBreakpoint = false;
-            var insideCell = false;
-
-            Breakpoint newBreakpoint = new Breakpoint();
-            Cells newCell = new Cells();
-
-            if (!File.Exists(saveName))
+            if (!File.Exists(_saveName))
             {
                 // No save data file found, call noSaveFile function to create a blank.
 
                 noSaveFile();
             }
 
-            System.Xml.XmlTextReader reader = new System.Xml.XmlTextReader(saveName);
-            while (reader.Read())
+            XmlSerializer serializer = new XmlSerializer(typeof(BPSaveClass));
+
+            serializer.UnknownNode += new XmlNodeEventHandler(serializer_UnknownNode);
+            serializer.UnknownAttribute += new XmlAttributeEventHandler(serializer_UnknownAttribute);
+
+            BPSaveClass bpm;
+
+            using (Stream reader = new FileStream(_saveName, FileMode.Open))
             {
-                if (reader.IsStartElement() && reader.Name.ToString() == "breakpoint")
-                {
-                    insideBreakpoint = true;
-                }
-
-                if (reader.IsStartElement() && reader.Name.ToString() == "cell")
-                {
-                    insideCell = true;
-                }
-
-                if (insideBreakpoint)
-                {
-                    switch (reader.Name.ToString())
-                    {
-                        case "id":
-                            newBreakpoint.BPID = Int32.Parse(reader.ReadString());
-                            break;
-                        case "cellid":
-                            newBreakpoint.BPCell = Int32.Parse(reader.ReadString());
-                            break;
-                        case "description":
-                            newBreakpoint.BPDescription = reader.ReadString();
-                            break;
-                        case "datestarted":
-                            newBreakpoint.BPStart = reader.ReadString();
-                            break;
-                        case "datefinished":
-                            newBreakpoint.BPFinish = reader.ReadString();
-                            break;
-                    }
-
-                }
-
-                if (insideCell)
-                {
-                    switch (reader.Name.ToString())
-                    {
-                        case "id":
-                            newCell.CellID = Int32.Parse(reader.ReadString());
-                            break;
-                        case "title":
-                            newCell.CellTitle = reader.ReadString();
-                            break;
-                    }
-
-                }
-
-                if (reader.NodeType == System.Xml.XmlNodeType.EndElement && reader.Name.ToString() == "breakpoint")
-                {
-                    newBreakpoint.BPCellNumber = RetCellFromCID(newBreakpoint.BPCell);
-                    _bpClass.Add(newBreakpoint);
-                    newBreakpoint = new Breakpoint();
-                    insideBreakpoint = false;
-                }
-
-                if (reader.NodeType == System.Xml.XmlNodeType.EndElement && reader.Name.ToString() == "cell")
-                {
-                    _bpCells.Add(newCell);
-                    newCell = new Cells();
-                    insideCell = false;
-                }
-
+                bpm = (BPSaveClass)serializer.Deserialize(reader);
             }
 
-            reader.Dispose();
+            _bpClass = new ObservableCollection<Breakpoint>(bpm.BreakpointList);
+
+            foreach (Cells item in bpm.CellsList)
+            {
+                _bpCells.Add(item);
+            }
+
+
+            UpdateCellsList();
+
             return true;
 
         }
@@ -333,36 +261,34 @@ namespace BPManager.Properties
 
         private void SaveFile()
         {
-            // save the current BPClass and BPCells to the xml file.
+             // save the current BPClass and BPCells to the xml file.
 
-            StringBuilder fileoutput = new StringBuilder();
+            BPSaveClass bpSave = new BPSaveClass();
 
-            fileoutput.Append("<breakpoints>\n");
+            bpSave.BreakpointList = _bpClass.ToList<Breakpoint>();
+            bpSave.CellsList = _bpCells.ToList<Cells>();
 
+            XmlSerializer serializer = new XmlSerializer(typeof(BPSaveClass));
 
-            foreach (var item in _bpCells)
+            serializer.UnknownNode += new XmlNodeEventHandler(serializer_UnknownNode);
+            serializer.UnknownAttribute += new XmlAttributeEventHandler(serializer_UnknownAttribute);
+
+            using (var writer = XmlWriter.Create(_saveName))
             {
-                fileoutput.Append("\t<cell>\n");
-                fileoutput.Append($"\t\t<id>{item.CellID}</id>\n");
-                fileoutput.Append($"\t\t<title>{item.CellTitle}</title>\n");
-                fileoutput.Append("\t</cell>\n");
+                serializer.Serialize(writer, bpSave);
             }
 
-            foreach (var item in _bpClass)
-            {
-                fileoutput.Append("\t<breakpoint>\n");
-                fileoutput.Append($"\t\t<id>{item.BPID}</id>\n");
-                fileoutput.Append($"\t\t<cellid>{item.BPCell}</cellid>\n");
-                fileoutput.Append($"\t\t<description>{item.BPDescription}</description>\n");
-                fileoutput.Append($"\t\t<datestarted>{item.BPStart}</datestarted>\n");
-                fileoutput.Append($"\t\t<datefinished>{item.BPFinish}</datefinished>\n");
-                fileoutput.Append("\t</breakpoint>\n");
-            }
+        }
 
-            fileoutput.Append("</breakpoints>");
-            System.IO.File.WriteAllLines(saveName, fileoutput.ToString().Split('\n'));
-            fileoutput.Clear();
+        private void serializer_UnknownAttribute(object sender, XmlAttributeEventArgs e)
+        {
+            System.Xml.XmlAttribute attr = e.Attr;
+            Console.WriteLine("Unknown attribute " + attr.Name + "='" + attr.Value + "'");
+        }
 
+        private void serializer_UnknownNode(object sender, XmlNodeEventArgs e)
+        {
+            Console.WriteLine("Unknown Node:" + e.Name + "\t" + e.Text);
         }
 
         public void UpdateListSearch(Cells selectedCell = null, Boolean addedit = false)

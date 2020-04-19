@@ -25,9 +25,9 @@ namespace BPManager
             InitializeComponent();
 
 
-            BPList.ItemsSource = BPManager.GetListSearch();
-            comboBPCell.ItemsSource = BPManager.GetBPCells();
-            comboSearchList.ItemsSource = BPManager.GetBPSearchCells();
+            BPList.ItemsSource = BPManager._listSearch;
+            comboBPCell.ItemsSource = BPManager._bpCells;
+            comboSearchList.ItemsSource = BPManager._bpSearchCells;
 
             // set the Filter to the first item ("Show All")
 
@@ -44,7 +44,7 @@ namespace BPManager
                 Breakpoint selectedBreakpoint = BPList.SelectedItem as Breakpoint;
 
                 textBPNumber.Text = selectedBreakpoint.BPID.ToString();
-                comboBPCell.SelectedIndex = (BPManager.GetBPCells().ToList().Exists(x => x.CellID == selectedBreakpoint.BPCell)) ? (BPManager.ReturnIDFromDropDown(selectedBreakpoint.BPCellNumber)) : -1;
+                comboBPCell.SelectedIndex = (BPManager._bpCells.ToList().Exists(x => x.CellID == selectedBreakpoint.BPCell)) ? (BPManager.ReturnIDFromDropDown(selectedBreakpoint.BPCellNumber)) : -1;
                 textBPDescription.Text = selectedBreakpoint.BPDescription;
                 dateBPStarted.SelectedDate = DateTime.Parse(selectedBreakpoint.BPStart);
                 dateBPFinished.SelectedDate = DateTime.Parse(selectedBreakpoint.BPFinish);
@@ -139,7 +139,7 @@ namespace BPManager
         {
             // opens settings, pass BPCells & BPClass through so we can add Cells from the settings 
 
-            new CellsEdit(BPManager.GetBPCells(), BPManager.GetBPClass()).Show();
+            new CellsEdit(BPManager._bpCells, BPManager._bpClass).Show();
 
         }
 
