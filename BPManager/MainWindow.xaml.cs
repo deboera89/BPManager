@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,6 +33,19 @@ namespace BPManager
             // set the Filter to the first item ("Show All")
 
             comboSearchList.SelectedIndex = 0;
+
+            if (BPManager._settings.isURL == true)
+            {
+
+                buttonDelete.IsEnabled = false;
+                buttonEdit.IsEnabled = false;
+                buttonNew.IsEnabled = false;
+                menuEditCells.IsEnabled = false;
+                menuNewBP.IsEnabled = false;
+                menuDeleteBP.IsEnabled = false;
+                menuEditBP.IsEnabled = false;
+
+            }
 
         }
 
@@ -150,5 +164,25 @@ namespace BPManager
             BPManager.UpdateListSearch(comboSearchList.SelectedItem as Cells);
         }
 
+        private void MenuSettings_Click(object sender, RoutedEventArgs e)
+        {
+            // open settings window, add a hook to the window close to run the closingSettings function
+
+            settingsWindow sw = new settingsWindow(BPManager);
+            sw.Closing += new System.ComponentModel.CancelEventHandler(closingSettings);
+            sw.Show();
+        }
+
+        private void closingSettings(object sender, CancelEventArgs e)
+        {
+            /*  called when the settings window closes
+                opens a new window and closes the current one
+                this allows the app to load from the new settings file
+
+            */
+
+            new MainWindow().Show();
+            this.Close();
+        }
     }
 }

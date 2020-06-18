@@ -27,14 +27,15 @@
         <Menu HorizontalAlignment="Left" VerticalAlignment="Top" Width="700" Grid.ColumnSpan="2">
 
             <MenuItem Header="File">
-                <MenuItem Header="New Breakpoint" HorizontalAlignment="Left" Width="200" Click="ButtonNew_Click"/>
-                <MenuItem Header="Edit Breakpoint" HorizontalAlignment="Left" Width="200" Click="ButtonEdit_Click"/>
-                <MenuItem Header="Delete Breakpoint" HorizontalAlignment="Left" Width="200" Click="ButtonDelete_Click"/>
+                <MenuItem Header="New Breakpoint" x:Name="menuNewBP" HorizontalAlignment="Left" Width="200" Click="ButtonNew_Click"/>
+                <MenuItem Header="Edit Breakpoint" x:Name="menuEditBP" HorizontalAlignment="Left" Width="200" Click="ButtonEdit_Click"/>
+                <MenuItem Header="Delete Breakpoint" x:Name="menuDeleteBP" HorizontalAlignment="Left" Width="200" Click="ButtonDelete_Click"/>
                 <Separator HorizontalAlignment="Left" Width="140" />
                 <MenuItem Header="Exit" HorizontalAlignment="Left" Width="200" Click="MenuItem_Click" />
             </MenuItem>
             <MenuItem Header="Settings">
                 <MenuItem Header="Edit Cells" x:Name="menuEditCells" Click="MenuEditCells_Click" />
+                <MenuItem Header="Settings" x:Name="menuSettings" Click="MenuSettings_Click" />
             </MenuItem>
 
         </Menu>

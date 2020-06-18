@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Windows;
 using System.Xml;
@@ -12,31 +13,33 @@ using System.Xml.Serialization;
 namespace BPManager.Properties
 {
     
-    class BreakpointManager
+    public class BreakpointManager
     {
 
 
-        private string _saveName = "datafile.xml";
+        private string _saveName = "test.xml";
 
         public ObservableCollection<Breakpoint> _bpClass { get; private set; }
         public ObservableCollection<Breakpoint> _listSearch { get; private set; }
         public ObservableCollection<Cells> _bpCells { get; private set; }
         public ObservableCollection<Cells> _bpSearchCells { get; private set; }
+        public BPSettings _settings;
 
         private bool finishedLoading = false;
 
-        public BreakpointManager() : this("datafile.xml") { }
-
-
-        public BreakpointManager(string saveName)
+        public BreakpointManager()
         {
-            _saveName = saveName;
+
+            _settings = LoadSettings();
+
+            _saveName = _settings.SaveFile;
             _bpCells = new ObservableCollection<Cells> { };
             _bpSearchCells = new ObservableCollection<Cells> { };
 
+
             AddShowAllToList();
 
-            _bpCells.CollectionChanged += BPCells_CollectionChanged;
+
 
             _bpClass = new ObservableCollection<Breakpoint> { };
             if (!LoadXML())
@@ -58,11 +61,40 @@ namespace BPManager.Properties
 
         }
 
+        private BPSettings LoadSettings()
+        {
+
+            string settingsLocation = "settings.xml";
+
+            // reads XML datafile and sets up the BPClass and BPCells lists. 
+
+            if (!File.Exists(settingsLocation))
+            {
+                // No save data file found, call noSaveFile function to create a blank.
+                //noSaveFile();
+            }
+
+            XmlSerializer serializer = new XmlSerializer(typeof(BPSettings));
+
+            serializer.UnknownNode += new XmlNodeEventHandler(serializer_UnknownNode);
+            serializer.UnknownAttribute += new XmlAttributeEventHandler(serializer_UnknownAttribute);
+
+            BPSettings bps;
+
+            using (Stream reader = new FileStream(settingsLocation, FileMode.Open))
+            {
+                bps = (BPSettings)serializer.Deserialize(reader);
+            }
+
+            return bps;
+
+        }
+
 
         private void BPCells_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             // update the GUI if Cells are added or deleted from the Edit Cells page
-            //Add listener for each item on PropertyChanged event
+            //Add listener for each item on PropertyChanged event            
 
             if (e.Action == NotifyCollectionChangedAction.Remove)
             {
@@ -78,8 +110,10 @@ namespace BPManager.Properties
             if (finishedLoading)
             {
                 // only save and update the cell list if a cell is added or removed from the edit cells page, not during the initial loading.
-
-                SaveFile();
+                if (!_settings.isURL)
+                {
+                    SaveFile();
+                }
                 UpdateCellsList();
 
             }
@@ -220,12 +254,13 @@ namespace BPManager.Properties
         }
 
 
-        private bool LoadXML()
+        public bool LoadXML()
         {
+            
 
             // reads XML datafile and sets up the BPClass and BPCells lists. 
 
-            if (!File.Exists(_saveName))
+            if (!File.Exists(_settings.SaveFile) && !_settings.isURL)
             {
                 // No save data file found, call noSaveFile function to create a blank.
 
@@ -239,18 +274,35 @@ namespace BPManager.Properties
 
             BPSaveClass bpm;
 
-            using (Stream reader = new FileStream(_saveName, FileMode.Open))
+
+            if (_settings.SaveFile.Substring(0, 7) == "http://")
             {
+                var textFromFile = (new WebClient()).DownloadString(_settings.SaveFile);
+                byte[] byteArray = Encoding.ASCII.GetBytes(textFromFile);
+                MemoryStream stream = new MemoryStream(byteArray);
+                StreamReader reader = new StreamReader(stream);
                 bpm = (BPSaveClass)serializer.Deserialize(reader);
             }
+            else
+            {
+                using (Stream reader = new FileStream(_settings.SaveFile, FileMode.Open))
+                {
+                    bpm = (BPSaveClass)serializer.Deserialize(reader);
+                }
+            }
+
+
 
             _bpClass = new ObservableCollection<Breakpoint>(bpm.BreakpointList);
+
+            _bpCells = new ObservableCollection<Cells>();
+            _bpCells.CollectionChanged += BPCells_CollectionChanged;
 
             foreach (Cells item in bpm.CellsList)
             {
                 _bpCells.Add(item);
             }
-
+            
 
             UpdateCellsList();
 
@@ -273,7 +325,7 @@ namespace BPManager.Properties
             serializer.UnknownNode += new XmlNodeEventHandler(serializer_UnknownNode);
             serializer.UnknownAttribute += new XmlAttributeEventHandler(serializer_UnknownAttribute);
 
-            using (var writer = XmlWriter.Create(_saveName))
+            using (var writer = XmlWriter.Create(_settings.SaveFile))
             {
                 serializer.Serialize(writer, bpSave);
             }
