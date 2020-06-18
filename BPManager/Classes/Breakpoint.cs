@@ -14,7 +14,7 @@ namespace BPManager.Properties
         [XmlElement("Description")]
         public string BPDescription { get; set; }
 
-        [XmlElement("DateDtarted")]
+        [XmlElement("DateStarted")]
         public string BPStart { get; set; }
 
         [XmlElement("DateFinished")]
