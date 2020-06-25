@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+
 namespace BPManager
 {
     /// <summary>
@@ -32,17 +33,31 @@ namespace BPManager
             this.bpm = bpm;
             editSettings = this.bpm._settings;
             textSaveFile.Text = editSettings.SaveFile;
+            if (editSettings.isURL)
+            {
+                rdoServerFile.IsChecked = true;
+            } else
+            {
+                rdoLocalFile.IsChecked = true;
+            }
         }
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
-        { 
+        {
             // setting a website as the url file will force the app into a read-only mode (no ability to add or edit breakpoints)
-
-            if (textSaveFile.Text.Substring(0, 7) == "http://")
+            if (rdoServerFile.IsChecked == true && textSaveFile.Text.Substring(0, 7) != "http://")
             {
-                MessageBox.Show("Note: setting the data location to a URL sets the program to a read only mode!");
+                MessageBoxResult mb = MessageBox.Show("Error:\r\nIt appears your url isn't valid, must start with 'http://'");
+                return;
+            }
+
+
+            if (rdoServerFile.IsChecked == true)
+            {
+
                 editSettings.isURL = true;
-            } else
+            }
+            else
             {
                 editSettings.isURL = false;
             }
@@ -54,5 +69,14 @@ namespace BPManager
             this.Close();
         }
 
+        private void RdoServerFile_Checked(object sender, RoutedEventArgs e)
+        {
+                lblServerWarning.Content = "Note:\r\nServer location sets the program to a read-only mode";
+        }
+
+        private void RdoLocalFile_Checked(object sender, RoutedEventArgs e)
+        {
+            lblServerWarning.Content = "";
+        }
     }
 }
